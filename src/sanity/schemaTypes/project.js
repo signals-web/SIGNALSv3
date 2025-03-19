@@ -39,9 +39,105 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'galleryImages',
+      title: 'Gallery Images',
+      type: 'array',
+      of: [
+        {
+          type: 'image',
+          options: {
+            hotspot: true,
+          },
+        },
+      ],
+    }),
+    defineField({
       name: 'description',
       title: 'Description',
+      type: 'array',
+      of: [
+        {
+          type: 'block',
+          styles: [
+            {title: 'Normal', value: 'normal'},
+            {title: 'H2', value: 'h2'},
+            {title: 'H3', value: 'h3'},
+            {title: 'Quote', value: 'blockquote'}
+          ],
+          marks: {
+            decorators: [
+              {title: 'Strong', value: 'strong'},
+              {title: 'Emphasis', value: 'em'},
+            ],
+          },
+        },
+      ],
+    }),
+    defineField({
+      name: 'shortDescription',
+      title: 'Short Description',
       type: 'text',
+      rows: 3,
+      validation: (Rule) => Rule.max(200),
+    }),
+    defineField({
+      name: 'authors',
+      title: 'Authors',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            {
+              name: 'name',
+              title: 'Name',
+              type: 'string',
+            },
+            {
+              name: 'role',
+              title: 'Role',
+              type: 'string',
+            },
+          ],
+        },
+      ],
+    }),
+    defineField({
+      name: 'client',
+      title: 'Client',
+      type: 'string',
+    }),
+    defineField({
+      name: 'projectDate',
+      title: 'Project Date',
+      type: 'object',
+      fields: [
+        {
+          name: 'startDate',
+          title: 'Start Date',
+          type: 'date',
+        },
+        {
+          name: 'endDate',
+          title: 'End Date',
+          type: 'date',
+        },
+      ],
+    }),
+    defineField({
+      name: 'categories',
+      title: 'Categories',
+      type: 'array',
+      of: [{ type: 'string' }],
+      options: {
+        list: [
+          { title: 'Typography', value: 'typography' },
+          { title: 'Wayfinding', value: 'wayfinding' },
+          { title: 'Editorial', value: 'editorial' },
+          { title: 'Exhibition', value: 'exhibition' },
+          { title: 'Identity', value: 'identity' },
+        ],
+      },
     }),
     defineField({
       name: 'publishedAt',
@@ -65,12 +161,15 @@ export default defineType({
       title: 'title',
       type: 'type',
       media: 'mainImage',
+      client: 'client',
     },
-    prepare(selection) {
-      const { title, type, media } = selection
+    prepare({ title, type, media, client }) {
       return {
         title,
-        subtitle: type.charAt(0).toUpperCase() + type.slice(1),
+        subtitle: [
+          type.charAt(0).toUpperCase() + type.slice(1),
+          client && `Client: ${client}`,
+        ].filter(Boolean).join(' • '),
         media,
       }
     },
