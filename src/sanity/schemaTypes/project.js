@@ -241,10 +241,9 @@ export default defineType({
       title: 'title',
       subtitle: 'subtitle',
       type: 'type',
-      media: 'mainImage',
-      client: 'client',
+      media: 'mainImage'
     },
-    prepare({ title, subtitle, type, media, client }) {
+    prepare({ title, subtitle, type, media }) {
       return {
         title,
         subtitle: subtitle || type.charAt(0).toUpperCase() + type.slice(1),
