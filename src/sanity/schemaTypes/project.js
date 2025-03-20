@@ -12,6 +12,11 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'subtitle',
+      title: 'Subtitle',
+      type: 'string',
+    }),
+    defineField({
       name: 'type',
       title: 'Type',
       type: 'string',
@@ -22,6 +27,22 @@ export default defineType({
         ],
       },
       validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'kind',
+      title: 'Kind',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Monograph', value: 'monograph' },
+          { title: 'Editorial', value: 'editorial' },
+          { title: 'History & Preservation', value: 'history-preservation' },
+          { title: 'Architecture & Philosophy', value: 'architecture-philosophy' },
+          { title: 'Architectural History', value: 'architectural-history' },
+          { title: 'Interior Design', value: 'interior-design' },
+          { title: 'Facsimile and Reproduction', value: 'facsimile' },
+        ],
+      },
     }),
     defineField({
       name: 'featured',
@@ -44,11 +65,44 @@ export default defineType({
       type: 'array',
       of: [
         {
-          type: 'image',
-          options: {
-            hotspot: true,
-          },
-        },
+          type: 'object',
+          fields: [
+            {
+              name: 'image',
+              title: 'Image',
+              type: 'image',
+              options: {
+                hotspot: true,
+              },
+            },
+            {
+              name: 'caption',
+              title: 'Caption',
+              type: 'string',
+              description: 'A brief description of the image',
+            },
+            {
+              name: 'altText',
+              title: 'Alt Text',
+              type: 'string',
+              description: 'Alternative text for accessibility',
+              validation: Rule => Rule.required(),
+            },
+            {
+              name: 'credit',
+              title: 'Credit',
+              type: 'string',
+              description: 'Photo credit or attribution',
+            }
+          ],
+          preview: {
+            select: {
+              title: 'caption',
+              subtitle: 'credit',
+              media: 'image'
+            }
+          }
+        }
       ],
     }),
     defineField({
@@ -146,6 +200,32 @@ export default defineType({
       initialValue: () => new Date().toISOString(),
     }),
     defineField({
+      name: 'publishDate',
+      title: 'Publish Date',
+      type: 'date',
+    }),
+    defineField({
+      name: 'designElements',
+      title: 'Design Elements',
+      type: 'array',
+      of: [
+        {
+          type: 'block',
+          styles: [
+            {title: 'Normal', value: 'normal'},
+            {title: 'H2', value: 'h2'},
+            {title: 'H3', value: 'h3'},
+          ],
+        },
+      ],
+    }),
+    defineField({
+      name: 'awards',
+      title: 'Awards',
+      type: 'array',
+      of: [{ type: 'string' }],
+    }),
+    defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
@@ -159,17 +239,15 @@ export default defineType({
   preview: {
     select: {
       title: 'title',
+      subtitle: 'subtitle',
       type: 'type',
       media: 'mainImage',
       client: 'client',
     },
-    prepare({ title, type, media, client }) {
+    prepare({ title, subtitle, type, media, client }) {
       return {
         title,
-        subtitle: [
-          type.charAt(0).toUpperCase() + type.slice(1),
-          client && `Client: ${client}`,
-        ].filter(Boolean).join(' • '),
+        subtitle: subtitle || type.charAt(0).toUpperCase() + type.slice(1),
         media,
       }
     },
