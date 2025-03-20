@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@next/font": "^14.2.15",
     "@sanity/block-tools": "^3.70.0",
     "@sanity/client": "^6.28.3",
     "@sanity/dashboard": "^3.1.6",
