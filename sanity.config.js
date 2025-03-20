@@ -11,7 +11,6 @@ import {apiVersion, dataset, projectId} from './src/sanity/env'
 import schemaTypes from './src/sanity/schemaTypes'
 import {dashboardTool} from '@sanity/dashboard'
 import {documentListWidget} from 'sanity-plugin-dashboard-widget-document-list'
-import {sanityTablePlugin} from 'sanity-plugin-table'
 
 // Go to https://www.sanity.io/docs/api-versioning to learn how API versioning works
 import {structure} from './src/sanity/structure'
@@ -27,7 +26,7 @@ export default defineConfig({
     types: schemaTypes,
   },
   plugins: [
-    structureTool({structure}),
+    structureTool(),
     // Vision is for querying with GROQ from inside the Studio
     // https://www.sanity.io/docs/the-vision-plugin
     visionTool({defaultApiVersion: apiVersion}),
@@ -39,7 +38,6 @@ export default defineConfig({
           layout: { width: 'full' }
         })
       ]
-    }),
-    sanityTablePlugin(),
+    })
   ],
 })
