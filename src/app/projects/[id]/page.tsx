@@ -1,10 +1,7 @@
-import Image from 'next/image'
-import Link from 'next/link'
 import { client } from '@/sanity/lib/client'
 import { groq } from 'next-sanity'
-import ImageCarousel from '@/app/components/ImageCarousel'
-import { notFound } from 'next/navigation'
 import ProjectContent from './ProjectContent'
+import { notFound } from 'next/navigation'
 
 interface ProjectProps {
   params: {

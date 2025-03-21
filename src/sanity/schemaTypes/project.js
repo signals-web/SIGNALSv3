@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { defineType, defineField } from 'sanity'
 
 export default defineType({
