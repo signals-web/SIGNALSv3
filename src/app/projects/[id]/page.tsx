@@ -17,7 +17,8 @@ async function getProject(id: string) {
     year,
     author,
     description,
-    "imageUrl": image.asset->url,
+    "imageUrl": mainImage.asset->url,
+    "images": gallery[].asset->url,
     "next": *[_type == "project" && ^.title < title] | order(title asc)[0] {
       _id,
       title
@@ -32,8 +33,7 @@ async function getProject(id: string) {
 }
 
 export default async function ProjectPage({ params }: ProjectProps) {
-  const searchParams = { id: params.id }
-  const project = await getProject(searchParams.id)
+  const project = await getProject(params.id)
   
   if (!project) {
     notFound()
