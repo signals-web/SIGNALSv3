@@ -1,12 +1,10 @@
 import { client } from '@/sanity/lib/client'
 import { groq } from 'next-sanity'
-import ProjectContent from './ProjectContent'
+import ProjectContent from '@/app/projects/[id]/ProjectContent'
 import { notFound } from 'next/navigation'
 
-interface ProjectProps {
-  params: {
-    id: string
-  }
+interface PageParams {
+  id: string
 }
 
 async function getProject(id: string) {
@@ -32,7 +30,11 @@ async function getProject(id: string) {
   return client.fetch(query, { id })
 }
 
-export default async function ProjectPage({ params }: ProjectProps) {
+export default async function ProjectPage({
+  params,
+}: {
+  params: PageParams
+}) {
   const project = await getProject(params.id)
   
   if (!project) {
