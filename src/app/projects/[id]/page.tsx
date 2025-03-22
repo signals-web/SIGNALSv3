@@ -26,12 +26,12 @@ async function getProject(id: string) {
   return client.fetch(query, { id })
 }
 
-interface Props {
+export default async function ProjectPage({
+  params,
+}: {
   params: { id: string }
-}
-
-export default async function ProjectPage(props: Props) {
-  const project = await getProject(props.params.id)
+}) {
+  const project = await getProject(params.id)
   
   if (!project) {
     notFound()
