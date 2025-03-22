@@ -5,7 +5,7 @@ import { groq } from 'next-sanity'
 import Link from 'next/link'
 import { DM_Sans } from 'next/font/google'
 import Image from 'next/image'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 const dmSans = DM_Sans({ 
   subsets: ['latin'],
@@ -20,7 +20,9 @@ interface Project {
   isSignage: boolean
 }
 
-async function getProjects(): Promise<Project[]> {
+type FilterType = 'all' | 'book' | 'signage'
+
+export async function getStaticProps() {
   const query = groq`*[_type == "project"] | order(title asc) {
     _id,
     title,
@@ -29,20 +31,14 @@ async function getProjects(): Promise<Project[]> {
     "isSignage": type in ["wayfinding", "exhibition-design", "wayfinding---donor-signage"]
   }`
   
-  return client.fetch(query)
+  const projects = await client.fetch(query)
+  return { props: { projects } }
 }
 
-type FilterType = 'all' | 'book' | 'signage'
-
-export default function Home() {
-  const [projects, setProjects] = useState<Project[]>([])
+export default function Home({ projects: initialProjects }: { projects: Project[] }) {
   const [filter, setFilter] = useState<FilterType>('all')
 
-  useEffect(() => {
-    getProjects().then(setProjects)
-  }, [])
-
-  const filteredProjects = projects.filter(project => {
+  const filteredProjects = initialProjects.filter(project => {
     if (filter === 'all') return true
     if (filter === 'book') return project.isBook
     if (filter === 'signage') return project.isSignage
