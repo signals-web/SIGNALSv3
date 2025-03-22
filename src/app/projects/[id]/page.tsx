@@ -26,11 +26,22 @@ async function getProject(id: string) {
   return client.fetch(query, { id })
 }
 
-export default async function ProjectPage({
-  params,
-}: {
+export async function generateStaticParams() {
+  const query = groq`*[_type == "project"] {
+    _id
+  }`
+  const projects = await client.fetch(query)
+  
+  return projects.map((project: { _id: string }) => ({
+    id: project._id,
+  }))
+}
+
+interface PageProps {
   params: { id: string }
-}) {
+}
+
+const ProjectPage = async ({ params }: PageProps) => {
   const project = await getProject(params.id)
   
   if (!project) {
@@ -38,4 +49,6 @@ export default async function ProjectPage({
   }
 
   return <ProjectContent project={project} />
-} 
+}
+
+export default ProjectPage 
