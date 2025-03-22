@@ -3,10 +3,6 @@ import { groq } from 'next-sanity'
 import ProjectContent from '@/app/projects/[id]/ProjectContent'
 import { notFound } from 'next/navigation'
 
-interface PageParams {
-  id: string
-}
-
 async function getProject(id: string) {
   const query = groq`*[_type == "project" && _id == $id][0] {
     _id,
@@ -30,12 +26,12 @@ async function getProject(id: string) {
   return client.fetch(query, { id })
 }
 
-export default async function ProjectPage({
-  params,
-}: {
-  params: PageParams
-}) {
-  const project = await getProject(params.id)
+interface Props {
+  params: { id: string }
+}
+
+export default async function ProjectPage(props: Props) {
+  const project = await getProject(props.params.id)
   
   if (!project) {
     notFound()
