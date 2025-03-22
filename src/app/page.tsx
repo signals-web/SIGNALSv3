@@ -22,7 +22,62 @@ interface Project {
 
 type FilterType = 'all' | 'book' | 'signage'
 
-export async function getStaticProps() {
+// Create a new client component for the interactive parts
+function ProjectList({ projects: initialProjects }: { projects: Project[] }) {
+  const [filter, setFilter] = useState<FilterType>('all')
+
+  const filteredProjects = initialProjects.filter(project => {
+    if (filter === 'all') return true
+    if (filter === 'book') return project.isBook
+    if (filter === 'signage') return project.isSignage
+    return true
+  })
+
+  return (
+    <>
+      <div className="flex gap-8 mb-12 relative z-10">
+        <button 
+          onClick={() => setFilter('all')}
+          className={filter === 'all' ? 'opacity-100' : 'opacity-50 hover:opacity-75'}
+        >
+          <AllIcon size={48} />
+        </button>
+        <button 
+          onClick={() => setFilter('book')}
+          className={filter === 'book' ? 'opacity-100' : 'opacity-50 hover:opacity-75'}
+        >
+          <BookIcon size={48} />
+        </button>
+        <button 
+          onClick={() => setFilter('signage')}
+          className={filter === 'signage' ? 'opacity-100' : 'opacity-50 hover:opacity-75'}
+        >
+          <SignageIcon size={48} />
+        </button>
+      </div>
+      
+      <div className="text-4xl transition-all duration-700 ease-in-out relative" style={{ lineHeight: 2 }}>
+        {filteredProjects?.map((project, index) => (
+          <span key={project._id} className="inline opacity-0 animate-fade-in transition-opacity duration-700 ease-in-out">
+            {index > 0 && <span className="mx-2">,</span>}
+            <Link href={`/projects/${project._id}`} className="group relative inline-block">
+              <div className="absolute w-[87.5%] aspect-[4/3] left-1/2 -translate-x-1/2 -bottom-4 bg-[#da1f2c] rounded-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <span className="relative z-[1]">
+                {project.isBook ? <BookIcon size={32} /> : project.isSignage ? <SignageIcon size={32} /> : null}
+                {' '}
+                {project.title}
+              </span>
+            </Link>
+          </span>
+        ))}
+        <span>.</span>
+      </div>
+    </>
+  )
+}
+
+// Create the server component (default export)
+export default async function Home() {
   const query = groq`*[_type == "project"] | order(title asc) {
     _id,
     title,
@@ -32,18 +87,6 @@ export async function getStaticProps() {
   }`
   
   const projects = await client.fetch(query)
-  return { props: { projects } }
-}
-
-export default function Home({ projects: initialProjects }: { projects: Project[] }) {
-  const [filter, setFilter] = useState<FilterType>('all')
-
-  const filteredProjects = initialProjects.filter(project => {
-    if (filter === 'all') return true
-    if (filter === 'book') return project.isBook
-    if (filter === 'signage') return project.isSignage
-    return true
-  })
   
   return (
     <main className={`min-h-screen bg-[#ee253d] text-white ${dmSans.className}`} style={{ fontWeight: 200 }}>
@@ -62,43 +105,7 @@ export default function Home({ projects: initialProjects }: { projects: Project[
           </nav>
         </header>
 
-        <div className="flex gap-8 mb-12 relative z-10">
-          <button 
-            onClick={() => setFilter('all')}
-            className={filter === 'all' ? 'opacity-100' : 'opacity-50 hover:opacity-75'}
-          >
-            <AllIcon size={48} />
-          </button>
-          <button 
-            onClick={() => setFilter('book')}
-            className={filter === 'book' ? 'opacity-100' : 'opacity-50 hover:opacity-75'}
-          >
-            <BookIcon size={48} />
-          </button>
-          <button 
-            onClick={() => setFilter('signage')}
-            className={filter === 'signage' ? 'opacity-100' : 'opacity-50 hover:opacity-75'}
-          >
-            <SignageIcon size={48} />
-          </button>
-        </div>
-        
-        <div className="text-4xl transition-all duration-700 ease-in-out relative" style={{ lineHeight: 2 }}>
-          {filteredProjects?.map((project, index) => (
-            <span key={project._id} className="inline opacity-0 animate-fade-in transition-opacity duration-700 ease-in-out">
-              {index > 0 && <span className="mx-2">,</span>}
-              <Link href={`/projects/${project._id}`} className="group relative inline-block">
-                <div className="absolute w-[87.5%] aspect-[4/3] left-1/2 -translate-x-1/2 -bottom-4 bg-[#da1f2c] rounded-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <span className="relative z-[1]">
-                  {project.isBook ? <BookIcon size={32} /> : project.isSignage ? <SignageIcon size={32} /> : null}
-                  {' '}
-                  {project.title}
-                </span>
-              </Link>
-            </span>
-          ))}
-          <span>.</span>
-        </div>
+        <ProjectList projects={projects} />
 
         <footer className="fixed bottom-0 left-0 right-0 bg-[#2c2d43] w-full">
           <div className="max-w-7xl mx-auto px-4">
