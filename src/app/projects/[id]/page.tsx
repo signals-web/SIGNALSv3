@@ -26,13 +26,12 @@ async function getProject(id: string) {
   return client.fetch(query, { id })
 }
 
-type PageProps = {
+export default async function ProjectPage({
+  params,
+}: {
   params: { id: string }
-  searchParams: { [key: string]: string | string[] | undefined }
-}
-
-export default async function ProjectPage(props: PageProps) {
-  const project = await getProject(props.params.id)
+}) {
+  const project = await getProject(params.id)
   
   if (!project) {
     notFound()
