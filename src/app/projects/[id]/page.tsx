@@ -37,11 +37,7 @@ export async function generateStaticParams() {
   }))
 }
 
-interface PageProps {
-  params: { id: string }
-}
-
-const ProjectPage = async ({ params }: PageProps) => {
+async function ProjectPage({ params }: { params: { id: string } }) {
   const project = await getProject(params.id)
   
   if (!project) {
