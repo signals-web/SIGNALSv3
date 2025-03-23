@@ -8,10 +8,13 @@ import Image from 'next/image'
 import { useState } from 'react'
 import imageUrlBuilder from '@sanity/image-url'
 
-const builder = imageUrlBuilder(client)
+const builder = imageUrlBuilder({
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '',
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+})
 
 function urlFor(source: any) {
-  return builder.image(source)
+  return builder.image(source).auto('format')
 }
 
 const dmSans = DM_Sans({ 
@@ -86,7 +89,11 @@ function ProjectList({ projects: initialProjects }: { projects: Project[] }) {
               {project.mainImage?.asset && (
                 <div className="absolute w-[87.5%] aspect-[4/3] left-1/2 -translate-x-1/2 -bottom-4 rounded-sm overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                   <Image
-                    src={urlFor(project.mainImage).width(800).height(600).url()}
+                    src={urlFor(project.mainImage)
+                      .width(800)
+                      .height(600)
+                      .quality(90)
+                      .url()}
                     alt={project.title}
                     fill
                     className="object-cover"
@@ -117,7 +124,12 @@ export default async function Home() {
     type,
     "isBook": type == "book",
     "isSignage": type in ["wayfinding", "exhibition-design", "wayfinding---donor-signage"],
-    mainImage
+    mainImage {
+      asset-> {
+        _ref,
+        _id
+      }
+    }
   }`
   
   const projects = await client.fetch(query)
