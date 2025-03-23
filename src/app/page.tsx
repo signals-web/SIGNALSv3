@@ -18,6 +18,22 @@ interface Project {
   type: string
   isBook: boolean
   isSignage: boolean
+  mainImage: {
+    asset: {
+      _ref: string
+      url: string
+    }
+  }
+  galleryImages: Array<{
+    image: {
+      asset: {
+        _ref: string
+        url: string
+      }
+    }
+    caption: string
+    altText: string
+  }>
 }
 
 type FilterType = 'all' | 'book' | 'signage'
@@ -61,7 +77,18 @@ function ProjectList({ projects: initialProjects }: { projects: Project[] }) {
           <span key={project._id} className="inline opacity-0 animate-fade-in transition-opacity duration-700 ease-in-out">
             {index > 0 && <span className="mx-2">,</span>}
             <Link href={`/projects/${project._id}`} className="group relative inline-block">
-              <div className="absolute w-[87.5%] aspect-[4/3] left-1/2 -translate-x-1/2 -bottom-4 bg-[#da1f2c] rounded-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              {project.mainImage?.asset?.url && (
+                <div className="absolute w-[87.5%] aspect-[4/3] left-1/2 -translate-x-1/2 -bottom-4 rounded-sm overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  <Image
+                    src={project.mainImage.asset.url}
+                    alt={project.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                  <div className="absolute inset-0 bg-[#da1f2c] mix-blend-multiply" />
+                </div>
+              )}
               <span className="relative z-[1]">
                 {project.isBook ? <BookIcon size={32} /> : project.isSignage ? <SignageIcon size={32} /> : null}
                 {' '}
@@ -83,7 +110,23 @@ export default async function Home() {
     title,
     type,
     "isBook": type == "book",
-    "isSignage": type in ["wayfinding", "exhibition-design", "wayfinding---donor-signage"]
+    "isSignage": type in ["wayfinding", "exhibition-design", "wayfinding---donor-signage"],
+    mainImage {
+      asset-> {
+        _ref,
+        url
+      }
+    },
+    galleryImages[] {
+      image {
+        asset-> {
+          _ref,
+          url
+        }
+      },
+      caption,
+      altText
+    }
   }`
   
   const projects = await client.fetch(query)

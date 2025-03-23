@@ -76,6 +76,12 @@ export default defineType({
               },
             },
             {
+              name: 'externalImageUrl',
+              title: 'External Image URL',
+              type: 'url',
+              description: 'URL for images hosted on Raster or other platforms',
+            },
+            {
               name: 'caption',
               title: 'Caption',
               type: 'string',
@@ -93,13 +99,83 @@ export default defineType({
               title: 'Credit',
               type: 'string',
               description: 'Photo credit or attribution',
+            },
+            {
+              name: 'order',
+              title: 'Display Order',
+              type: 'number',
+              description: 'Order in which the image appears in the gallery (optional)',
+            },
+            {
+              name: 'tags',
+              title: 'Tags',
+              type: 'array',
+              of: [{ type: 'string' }],
+              options: {
+                layout: 'tags'
+              }
+            },
+            {
+              name: 'sourceInfo',
+              title: 'Source Information',
+              type: 'object',
+              fields: [
+                {
+                  name: 'platform',
+                  title: 'Platform',
+                  type: 'string',
+                  options: {
+                    list: [
+                      { title: 'Sanity', value: 'sanity' },
+                      { title: 'Raster', value: 'raster' },
+                      { title: 'Other', value: 'other' }
+                    ]
+                  }
+                },
+                {
+                  name: 'id',
+                  title: 'External ID',
+                  type: 'string',
+                  description: 'ID of the image in the external platform (e.g., Raster ID)'
+                },
+                {
+                  name: 'metadata',
+                  title: 'Additional Metadata',
+                  type: 'object',
+                  fields: [
+                    {
+                      name: 'width',
+                      title: 'Width',
+                      type: 'number'
+                    },
+                    {
+                      name: 'height',
+                      title: 'Height',
+                      type: 'number'
+                    },
+                    {
+                      name: 'format',
+                      title: 'Format',
+                      type: 'string'
+                    }
+                  ]
+                }
+              ]
             }
           ],
           preview: {
             select: {
               title: 'caption',
               subtitle: 'credit',
-              media: 'image'
+              media: 'image',
+              externalUrl: 'externalImageUrl'
+            },
+            prepare({ title, subtitle, media, externalUrl }) {
+              return {
+                title: title || 'Untitled',
+                subtitle: subtitle,
+                media: media || externalUrl
+              }
             }
           }
         }
@@ -116,14 +192,7 @@ export default defineType({
             {title: 'Normal', value: 'normal'},
             {title: 'H2', value: 'h2'},
             {title: 'H3', value: 'h3'},
-            {title: 'Quote', value: 'blockquote'}
           ],
-          marks: {
-            decorators: [
-              {title: 'Strong', value: 'strong'},
-              {title: 'Emphasis', value: 'em'},
-            ],
-          },
         },
       ],
     }),
@@ -155,6 +224,11 @@ export default defineType({
           ],
         },
       ],
+    }),
+    defineField({
+      name: 'author',
+      title: 'Author',
+      type: 'string',
     }),
     defineField({
       name: 'client',
@@ -194,10 +268,14 @@ export default defineType({
       },
     }),
     defineField({
+      name: 'projectYear',
+      title: 'Project Year',
+      type: 'number',
+    }),
+    defineField({
       name: 'publishedAt',
       title: 'Published at',
       type: 'datetime',
-      initialValue: () => new Date().toISOString(),
     }),
     defineField({
       name: 'publishDate',
