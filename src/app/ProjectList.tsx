@@ -1,24 +1,16 @@
 'use client'
 
-import { client } from '@/sanity/lib/client'
-import { groq } from 'next-sanity'
 import Link from 'next/link'
-import { DM_Sans } from 'next/font/google'
 import Image from 'next/image'
 import { useState } from 'react'
 import imageUrlBuilder from '@sanity/image-url'
-import { ProjectList } from './ProjectList'
+import { client } from '@/sanity/lib/client'
 
 const builder = imageUrlBuilder(client)
 
 function urlFor(source: any) {
   return builder.image(source)
 }
-
-const dmSans = DM_Sans({ 
-  subsets: ['latin'],
-  weight: ['200', '400']
-})
 
 interface Project {
   _id: string
@@ -31,22 +23,11 @@ interface Project {
       _ref: string
     }
   }
-  galleryImages: Array<{
-    image: {
-      asset: {
-        _ref: string
-        url: string
-      }
-    }
-    caption: string
-    altText: string
-  }>
 }
 
 type FilterType = 'all' | 'book' | 'signage'
 
-// Create a new client component for the interactive parts
-function ProjectList({ projects: initialProjects }: { projects: Project[] }) {
+export function ProjectList({ projects: initialProjects }: { projects: Project[] }) {
   const [filter, setFilter] = useState<FilterType>('all')
 
   const filteredProjects = initialProjects.filter(project => {
@@ -113,64 +94,6 @@ function ProjectList({ projects: initialProjects }: { projects: Project[] }) {
   )
 }
 
-// Create the server component (default export)
-export default async function Home() {
-  const query = groq`*[_type == "project"] | order(title asc) {
-    _id,
-    title,
-    type,
-    "isBook": type == "book",
-    "isSignage": type in ["wayfinding", "exhibition-design", "wayfinding---donor-signage"],
-    mainImage {
-      asset->,
-      hotspot,
-      crop
-    }
-  }`
-  
-  const projects = await client.fetch(query)
-  
-  console.log('Projects:', JSON.stringify(projects, null, 2))
-  
-  return (
-    <main className={`min-h-screen bg-[#ee253d] text-white ${dmSans.className}`} style={{ fontWeight: 200 }}>
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <header className="flex justify-between items-center mb-12">
-          <Image 
-            src="/signals-header.png" 
-            alt="SIGNALS"
-            width={375}
-            height={75}
-            priority
-          />
-          <nav className="text-4xl">
-            <Link href="/about" className="mr-8">About</Link>
-            <Link href="/contact">Contact</Link>
-          </nav>
-        </header>
-
-        <ProjectList projects={projects} />
-
-        <footer className="fixed bottom-0 left-0 right-0 bg-[#2c2d43] w-full">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="grid grid-cols-3 gap-8 text-xl pb-8">
-              <div className="bg-black/50 aspect-[6/1] rounded-sm flex items-center justify-center">
-                Location
-              </div>
-              <div className="bg-black/50 aspect-[6/1] rounded-sm flex items-center justify-center">
-                Socials
-              </div>
-              <div className="bg-black/50 aspect-[6/1] rounded-sm flex items-center justify-center">
-                Graphics
-              </div>
-            </div>
-          </div>
-        </footer>
-      </div>
-    </main>
-  )
-}
-
 function AllIcon({ size = 16 }: { size?: number }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 16 16" className="inline-block">
@@ -193,4 +116,4 @@ function SignageIcon({ size = 24 }: { size?: number }) {
       <path fill="currentColor" d="M7.75 0a.75.75 0 0 1 .75.75V3h3.634c.414 0 .814.147 1.13.414l2.07 1.75a1.75 1.75 0 0 1 0 2.672l-2.07 1.75a1.75 1.75 0 0 1-1.13.414H8.5v5.25a.75.75 0 0 1-1.5 0V10H2.75A1.75 1.75 0 0 1 1 8.25v-3.5C1 3.784 1.784 3 2.75 3H7V.75A.75.75 0 0 1 7.75 0m4.384 8.5a.25.25 0 0 0 .161-.06l2.07-1.75a.248.248 0 0 0 0-.38l-2.07-1.75a.25.25 0 0 0-.161-.06H2.75a.25.25 0 0 0-.25.25v3.5c0 .138.112.25.25.25z"/>
     </svg>
   )
-}
+} 
