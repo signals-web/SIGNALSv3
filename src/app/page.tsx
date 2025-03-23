@@ -6,6 +6,13 @@ import Link from 'next/link'
 import { DM_Sans } from 'next/font/google'
 import Image from 'next/image'
 import { useState } from 'react'
+import imageUrlBuilder from '@sanity/image-url'
+
+const builder = imageUrlBuilder(client)
+
+function urlFor(source: any) {
+  return builder.image(source)
+}
 
 const dmSans = DM_Sans({ 
   subsets: ['latin'],
@@ -18,10 +25,9 @@ interface Project {
   type: string
   isBook: boolean
   isSignage: boolean
-  mainImage: {
+  mainImage?: {
     asset: {
       _ref: string
-      url: string
     }
   }
   galleryImages: Array<{
@@ -77,10 +83,10 @@ function ProjectList({ projects: initialProjects }: { projects: Project[] }) {
           <span key={project._id} className="inline opacity-0 animate-fade-in transition-opacity duration-700 ease-in-out">
             {index > 0 && <span className="mx-2">,</span>}
             <Link href={`/projects/${project._id}`} className="group relative inline-block">
-              {project.mainImage?.asset?.url && (
+              {project.mainImage?.asset && (
                 <div className="absolute w-[87.5%] aspect-[4/3] left-1/2 -translate-x-1/2 -bottom-4 rounded-sm overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                   <Image
-                    src={project.mainImage.asset.url}
+                    src={urlFor(project.mainImage).width(800).height(600).url()}
                     alt={project.title}
                     fill
                     className="object-cover"
@@ -111,22 +117,7 @@ export default async function Home() {
     type,
     "isBook": type == "book",
     "isSignage": type in ["wayfinding", "exhibition-design", "wayfinding---donor-signage"],
-    mainImage {
-      asset-> {
-        _ref,
-        url
-      }
-    },
-    galleryImages[] {
-      image {
-        asset-> {
-          _ref,
-          url
-        }
-      },
-      caption,
-      altText
-    }
+    mainImage
   }`
   
   const projects = await client.fetch(query)
