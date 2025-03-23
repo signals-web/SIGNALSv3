@@ -8,13 +8,10 @@ import Image from 'next/image'
 import { useState } from 'react'
 import imageUrlBuilder from '@sanity/image-url'
 
-const builder = imageUrlBuilder({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '',
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
-})
+const builder = imageUrlBuilder(client)
 
 function urlFor(source: any) {
-  return builder.image(source).auto('format')
+  return builder.image(source)
 }
 
 const dmSans = DM_Sans({ 
@@ -99,7 +96,6 @@ function ProjectList({ projects: initialProjects }: { projects: Project[] }) {
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
-                  <div className="absolute inset-0 bg-[#da1f2c] mix-blend-multiply" />
                 </div>
               )}
               <span className="relative z-[1]">
@@ -125,14 +121,15 @@ export default async function Home() {
     "isBook": type == "book",
     "isSignage": type in ["wayfinding", "exhibition-design", "wayfinding---donor-signage"],
     mainImage {
-      asset-> {
-        _ref,
-        _id
-      }
+      asset->,
+      hotspot,
+      crop
     }
   }`
   
   const projects = await client.fetch(query)
+  
+  console.log('Projects:', JSON.stringify(projects, null, 2))
   
   return (
     <main className={`min-h-screen bg-[#ee253d] text-white ${dmSans.className}`} style={{ fontWeight: 200 }}>
